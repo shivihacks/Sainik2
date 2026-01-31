@@ -392,4 +392,43 @@
             const profile = document.getElementById('userHeaderProfile');
             const locked = document.getElementById('admissionLocked');
             const form = document.getElementById('admissionFormContainer');
-     
+            if (user) {
+                btnAuth.classList.add('hidden');
+                profile.classList.replace('hidden', 'flex');
+                document.getElementById('headerUserEmail').innerText = user.email;
+                document.getElementById('headerUserName').innerText = user.displayName || user.email.split('@')[0];
+                locked.classList.add('hidden');
+                form.classList.remove('hidden');
+            } else {
+                btnAuth.classList.remove('hidden');
+                profile.classList.replace('flex', 'hidden');
+                locked.classList.remove('hidden');
+                form.classList.add('hidden');
+            }
+        }
+
+        window.showAuthView = (view) => {
+            ['view-login', 'view-register', 'view-forgot'].forEach(v => document.getElementById(v).classList.add('hidden'));
+            document.getElementById(`view-${view}`).classList.remove('hidden');
+            document.getElementById('authTitle').innerText = view === 'login' ? 'लॉगिन' : view === 'register' ? 'नया अकाउंट' : 'पासवर्ड रिसेट';
+        };
+
+        window.switchTab = (tab) => {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            ['btn-home', 'btn-admission', 'btn-auth'].forEach(b => {
+                const el = document.getElementById(b);
+                if(el) el.className = b === `btn-${tab}` ? "flex-1 py-3 text-blue-900 font-bold border-b-4 border-blue-900 bg-blue-50" : "flex-1 py-3 text-gray-500 font-bold border-b-4 border-transparent";
+            });
+        };
+
+        function showToast(msg, type) {
+            const t = document.getElementById('statusMessage');
+            t.className = `fixed top-24 right-4 z-50 p-4 rounded-lg shadow-lg border-l-4 ${type === 'success' ? 'bg-green-100 text-green-800 border-green-500' : 'bg-blue-100 text-blue-800 border-blue-500'}`;
+            t.innerText = msg;
+            t.classList.remove('hidden');
+            setTimeout(() => t.classList.add('hidden'), 3000);
+        }
+    </script>
+</body>
+</html>
