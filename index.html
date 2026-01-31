@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sainik Inter College | Student Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans Devanagari', sans-serif;
+            background-color: #f0f4f8;
+        }
+
+        .principal-bounce {
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Google Button Style */
+        .google-btn {
+            background-color: white;
+            color: #757575;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+        .google-btn:hover {
+            background-color: #f7f7f7;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-blue-900 text-white shadow-lg relative">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="text-center md:text-left">
+                    <div class="flex items-center justify-center md:justify-start gap-3">
+                        <i class="fas fa-university text-3xl text-yellow-400"></i>
+                        <h1 class="text-2xl md:text-3xl font-bold tracking-wide">सैनिक इंटर कॉलेज</h1>
+                    </div>
+                    <div class="flex items-center justify-center md:justify-start gap-2 mt-2">
+                        <span class="text-xs text-blue-200 bg-blue-800 px-2 py-1 rounded">प्रधानाचार्य</span>
+                        <span class="principal-bounce text-yellow-400 font-bold text-sm">MR. AKHALESH BAJPEYI</span>
+                    </div>
+                </div>
+
+                <!-- Logged In Profile -->
+                <div id="userHeaderProfile" class="hidden flex items-center gap-3 bg-blue-800 px-4 py-2 rounded-lg">
+                    <div class="text-right">
+                        <div id="headerUserName" class="text-sm font-bold text-white">Student</div>
+                        <div id="headerUserEmail" class="text-xs text-blue-200">user@example.com</div>
+                    </div>
+                    <button onclick="handleLogout()" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full transition-colors" title="Logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-10">
+        <div class="container mx-auto max-w-4xl">
+            <div class="flex justify-center" id="navButtons">
+                <button onclick="switchTab('home')" id="btn-home" class="flex-1 py-3 text-blue-900 font-bold border-b-4 border-blue-900 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2">
+                    <i class="fas fa-home"></i> <span class="hidden sm:inline">होम</span>
+                </button>
+                <button onclick="switchTab('admission')" id="btn-admission" class="flex-1 py-3 text-gray-500 font-bold border-b-4 border-transparent hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
+                    <i class="fas fa-user-graduate"></i> <span class="hidden sm:inline">एडमिशन</span>
+                </button>
+                <button onclick="switchTab('auth')" id="btn-auth" class="flex-1 py-3 text-gray-500 font-bold border-b-4 border-transparent hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
+                    <i class="fas fa-sign-in-alt"></i> <span class="hidden sm:inline">लॉगिन / साइन अप</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto max-w-4xl px-4 py-8 relative">
+        <div id="statusMessage" class="hidden fixed top-24 right-4 z-50 max-w-sm w-full p-4 rounded-lg shadow-lg transform transition-all duration-300"></div>
+
+        <!-- 1. HOME -->
+        <div id="home" class="tab-content active fade-in">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border-l-4 border-yellow-500 p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-bullhorn text-yellow-600"></i> सूचना पट्ट (Notice Board)
+                </h2>
+                <div class="space-y-4">
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                        <p class="text-blue-900 font-bold">📢 Google लॉगिन अब उपलब्ध है</p>
+                        <p class="text-gray-600 mt-1">sab baैक्चों se ka rahु ka ap ं।</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 2. ADMISSION -->
+        <div id="admission" class="tab-content fade-in">
+            <div id="admissionLocked" class="bg-white rounded-xl shadow-md p-8 text-center border-t-4 border-gray-400">
+                <div class="text-6xl text-gray-300 mb-4"><i class="fas fa-lock"></i></div>
+                <h3 class="text-2xl font-bold text-gray-700 mb-2">लॉगिन आवश्यक है</h3>
+                <p class="text-gray-500 mb-6">एडमिशन फॉर्म भरने के लिए पहले लॉगिन करें।</p>
+                <button onclick="switchTab('auth')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full">लॉगिन करें</button>
+            </div>
+
+            <div id="admissionFormContainer" class="hidden bg-white rounded-xl shadow-md p-6 border-t-4 border-green-500">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">ऑनलाइन एडमिशन फॉर्म</h2>
+                <form id="admForm" class="space-y-5">
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <input type="text" id="sName" class="w-full p-3 border rounded-lg" placeholder="छात्र का नाम" required>
+                        <input type="text" id="fName" class="w-full p-3 border rounded-lg" placeholder="पिता का नाम" required>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <select id="sClass" class="w-full p-3 border rounded-lg bg-white" required>
+                            <option value="">कक्षा चुनें...</option>
+                            <option>6th</option><option>9th</option><option>11th</option>
+                        </select>
+                        <input type="tel" id="sPhone" class="w-full p-3 border rounded-lg" placeholder="मोबाइल नंबर" pattern="[0-9]{10}" required>
+                    </div>
+                    <button type="submit" id="submitBtn" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg shadow hover:bg-green-700 transition">सबमिट करें</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 3. AUTH TAB -->
+        <div id="auth" class="tab-content fade-in">
+            <div class="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8">
+                
+                <h2 class="text-2xl font-bold text-center text-blue-900 mb-6" id="authTitle">लॉगिन (Login)</h2>
+
+                <!-- Google Login Button -->
+                <button id="googleLoginBtn" class="w-full google-btn py-3 rounded-lg font-medium mb-6 shadow-sm border">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5">
+                    Google के साथ आगे बढ़ें
+                </button>
+
+                <div class="relative flex py-3 items-center mb-6">
+                    <div class="flex-grow border-t border-gray-300"></div>
+                    <span class="flex-shrink mx-4 text-gray-400 text-sm">या (Email से)</span>
+                    <div class="flex-grow border-t border-gray-300"></div>
+                </div>
+
+                <!-- Login View -->
+                <div id="view-login">
+                    <form id="loginForm" class="space-y-4">
+                        <input type="email" id="loginEmail" class="w-full p-3 border rounded-lg" placeholder="ईमेल" required>
+                        <input type="password" id="loginPass" class="w-full p-3 border rounded-lg" placeholder="पासवर्ड" required>
+                        <button type="submit" class="w-full bg-blue-900 text-white py-3 rounded-lg font-bold">लॉगिन</button>
+                    </form>
+                    <div class="mt-4 flex justify-between text-sm">
+                        <a href="#" onclick="showAuthView('register')" class="text-blue-600 font-bold">नया अकाउंट बनाएं</a>
+                        <a href="#" onclick="showAuthView('forgot')" class="text-gray-500">पासवर्ड भूल गए?</a>
+                    </div>
+                </div>
+
+                <!-- Register View -->
+                <div id="view-register" class="hidden">
+                    <form id="registerForm" class="space-y-4">
+                        <input type="email" id="regEmail" class="w-full p-3 border rounded-lg" placeholder="ईमेल" required>
+                        <input type="password" id="regPass" class="w-full p-3 border rounded-lg" placeholder="पासवर्ड (Min 6 char)" required>
+                        <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold">रजिस्टर करें</button>
+                    </form>
+                    <button onclick="showAuthView('login')" class="mt-4 text-blue-600 text-sm font-bold">वापस लॉगिन पर जाएं</button>
+                </div>
+
+                <!-- Forgot View -->
+                <div id="view-forgot" class="hidden text-center">
+                    <p class="text-sm text-gray-600 mb-4">अपना ईमेल डालें, हम पासवर्ड रिसेट लिंक भेजेंगे।</p>
+                    <form id="forgotForm" class="space-y-4">
+                        <input type="email" id="forgotEmail" class="w-full p-3 border rounded-lg" placeholder="ईमेल" required>
+                        <button type="submit" class="w-full bg-orange-500 text-white py-3 rounded-lg font-bold">लिंक भेजें</button>
+                    </form>
+                    <button onclick="showAuthView('login')" class="mt-4 text-blue-600 text-sm font-bold">वापस लॉगिन</button>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, 
+            signOut, sendPasswordResetEmail, onAuthStateChanged,
+            GoogleAuthProvider, signInWithPopup 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCtsXHf2h90xQvjcpjte-lzO89LSZKJMOo",
+            authDomain: "sainik-inter-collage.firebaseapp.com",
+            projectId: "sainik-inter-collage",
+            storageBucket: "sainik-inter-collage.firebasestorage.app",
+            messagingSenderId: "848432356497",
+            appId: "1:848432356497:web:7a89e08caa29fc4e61b330"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        let currentUser = null;
+
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            updateUI(user);
+        });
+
+        // 1. Google Login
+        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+            try {
+                showToast("Google से लॉगिन हो रहा है...", "info");
+                await signInWithPopup(auth, googleProvider);
+                showToast("सफल लॉगिन!", "success");
+                window.switchTab('home');
+            } catch (error) {
+                console.error(error);
+                showToast("Google लॉगिन फेल हुआ।", "error");
+            }
+        });
+
+        // 2. Email Login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await signInWithEmailAndPassword(auth, loginEmail.value, loginPass.value);
+                showToast("लॉगिन सफल!", "success");
+                window.switchTab('home');
+            } catch (error) { showToast("लॉगिन त्रुटि: " + error.message, "error"); }
+        });
+
+        // 3. Register
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await createUserWithEmailAndPassword(auth, regEmail.value, regPass.value);
+                showToast("अकाउंट बन गया!", "success");
+                window.switchTab('home');
+            } catch (error) { showToast("रजिस्टर त्रुटि: " + error.message, "error"); }
+        });
+
+        // 4. Logout
+        window.handleLogout = () => signOut(auth);
+
+        // 5. Submit Form
+        document.getElementById('admForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(!currentUser) return;
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            try {
+                const admissionsRef = collection(db, 'artifacts', appId, 'public', 'data', 'admissions');
+                await addDoc(admissionsRef, {
+                    studentName: sName.value,
+                    fatherName: fName.value,
+                    class: sClass.value,
+                    phone: sPhone.value,
+                    email: currentUser.email,
+                    submittedAt: serverTimestamp()
+                });
+                showToast("आवेदन जमा हो गया!", "success");
+                admForm.reset();
+            } catch (e) { showToast("Error: " + e.message, "error"); }
+            btn.disabled = false;
+        });
+
+        function updateUI(user) {
+            const btnAuth = document.getElementById('btn-auth');
+            const profile = document.getElementById('userHeaderProfile');
+            const locked = document.getElementById('admissionLocked');
+            const form = document.getElementById('admissionFormContainer');
+            if (user) {
+                btnAuth.classList.add('hidden');
+                profile.classList.replace('hidden', 'flex');
+                document.getElementById('headerUserEmail').innerText = user.email;
+                document.getElementById('headerUserName').innerText = user.displayName || user.email.split('@')[0];
+                locked.classList.add('hidden');
+                form.classList.remove('hidden');
+            } else {
+                btnAuth.classList.remove('hidden');
+                profile.classList.replace('flex', 'hidden');
+                locked.classList.remove('hidden');
+                form.classList.add('hidden');
+            }
+        }
+
+        window.showAuthView = (view) => {
+            ['view-login', 'view-register', 'view-forgot'].forEach(v => document.getElementById(v).classList.add('hidden'));
+            document.getElementById(`view-${view}`).classList.remove('hidden');
+            document.getElementById('authTitle').innerText = view === 'login' ? 'लॉगिन' : view === 'register' ? 'नया अकाउंट' : 'पासवर्ड रिसेट';
+        };
+
+        window.switchTab = (tab) => {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            ['btn-home', 'btn-admission', 'btn-auth'].forEach(b => {
+                const el = document.getElementById(b);
+                if(el) el.className = b === `btn-${tab}` ? "flex-1 py-3 text-blue-900 font-bold border-b-4 border-blue-900 bg-blue-50" : "flex-1 py-3 text-gray-500 font-bold border-b-4 border-transparent";
+            });
+        };
+
+        function showToast(msg, type) {
+            const t = document.getElementById('statusMessage');
+            t.className = `fixed top-24 right-4 z-50 p-4 rounded-lg shadow-lg border-l-4 ${type === 'success' ? 'bg-green-100 text-green-800 border-green-500' : 'bg-blue-100 text-blue-800 border-blue-500'}`;
+            t.innerText = msg;
+            t.classList.remove('hidden');
+            setTimeout(() => t.classList.add('hidden'), 3000);
+        }
+    </script>
+</body>
+</html>
