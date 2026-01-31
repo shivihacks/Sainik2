@@ -178,6 +178,70 @@
                 </form>
             </div>
         </div>
+<br>
+<div class="relative max-w-4xl mx-auto my-10 px-2 overflow-hidden">
+    <div id="slider-container" class="relative h-64 md:h-[450px] rounded-2xl shadow-2xl border-4 border-white overflow-hidden">
+        
+        <div class="mySlides animate__animated animate__fadeIn absolute inset-0">
+            <img src="https://image2url.com/r2/default/images/1769875513895-0321fbbd-b1ed-49fb-8612-a8e4a4135c89.blob" class="w-full h-full object-cover">
+            <div class="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-sm p-4 text-white text-center font-bold">
+              🌲एक पेड़ मां के नाम
+            </div>
+        </div>
+
+        <div class="mySlides animate__animated animate__fadeIn absolute inset-0 hidden">
+            <img src="https://image2url.com/r2/default/images/1769875626838-9229a4b9-ccdd-43f7-b999-5df070bf7ba9.blob" class="w-full h-full object-cover">
+            <div class="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-sm p-4 text-white text-center font-bold">
+               🌲एक पेड़ मां के नाम
+            </div>
+        </div>
+
+        <div class="mySlides animate__animated animate__fadeIn absolute inset-0 hidden">
+            <img src="https://image2url.com/r2/default/images/1769875727935-7857b7f3-8ad7-453f-8b6f-8436e4d2d915.blob" class="w-full h-full object-cover">
+            <div class="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-sm p-4 text-white text-center font-bold">
+                🌲एक पेड़ मां के नाम
+            </div>
+        </div>
+
+    </div>
+
+    <div class="flex justify-center gap-3 mt-4">
+        <span class="dot w-3 h-3 bg-blue-900 rounded-full transition-all duration-300"></span>
+        <span class="dot w-3 h-3 bg-gray-300 rounded-full transition-all duration-300"></span>
+        <span class="dot w-3 h-3 bg-gray-300 rounded-full transition-all duration-300"></span>
+    </div>
+</div>
+
+<script>
+    let slideIndex = 0;
+    showSlides();
+
+    function showSlides() {
+        let i;
+        let slides = document.getElementsByClassName("mySlides");
+        let dots = document.getElementsByClassName("dot");
+        
+        // Sabhi slides ko pehle hide karein
+        for (i = 0; i < slides.length; i++) {
+            slides[i].classList.add("hidden");
+        }
+        
+        slideIndex++;
+        if (slideIndex > slides.length) {slideIndex = 1}
+        
+        // Sabhi dots ko gray karein
+        for (i = 0; i < dots.length; i++) {
+            dots[i].className = dots[i].className.replace(" bg-blue-900", " bg-gray-300");
+        }
+        
+        // Current slide dikhayein aur dot color badlein
+        slides[slideIndex-1].classList.remove("hidden");
+        dots[slideIndex-1].className = dots[slideIndex-1].className.replace(" bg-gray-300", " bg-blue-900");
+        
+        setTimeout(showSlides, 4000); // 4 Second mein photo apne aap badlegi
+    }
+</script>
+
 
         <!-- 3. AUTH TAB -->
         <div id="auth" class="tab-content fade-in">
@@ -328,43 +392,4 @@
             const profile = document.getElementById('userHeaderProfile');
             const locked = document.getElementById('admissionLocked');
             const form = document.getElementById('admissionFormContainer');
-            if (user) {
-                btnAuth.classList.add('hidden');
-                profile.classList.replace('hidden', 'flex');
-                document.getElementById('headerUserEmail').innerText = user.email;
-                document.getElementById('headerUserName').innerText = user.displayName || user.email.split('@')[0];
-                locked.classList.add('hidden');
-                form.classList.remove('hidden');
-            } else {
-                btnAuth.classList.remove('hidden');
-                profile.classList.replace('flex', 'hidden');
-                locked.classList.remove('hidden');
-                form.classList.add('hidden');
-            }
-        }
-
-        window.showAuthView = (view) => {
-            ['view-login', 'view-register', 'view-forgot'].forEach(v => document.getElementById(v).classList.add('hidden'));
-            document.getElementById(`view-${view}`).classList.remove('hidden');
-            document.getElementById('authTitle').innerText = view === 'login' ? 'लॉगिन' : view === 'register' ? 'नया अकाउंट' : 'पासवर्ड रिसेट';
-        };
-
-        window.switchTab = (tab) => {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.getElementById(tab).classList.add('active');
-            ['btn-home', 'btn-admission', 'btn-auth'].forEach(b => {
-                const el = document.getElementById(b);
-                if(el) el.className = b === `btn-${tab}` ? "flex-1 py-3 text-blue-900 font-bold border-b-4 border-blue-900 bg-blue-50" : "flex-1 py-3 text-gray-500 font-bold border-b-4 border-transparent";
-            });
-        };
-
-        function showToast(msg, type) {
-            const t = document.getElementById('statusMessage');
-            t.className = `fixed top-24 right-4 z-50 p-4 rounded-lg shadow-lg border-l-4 ${type === 'success' ? 'bg-green-100 text-green-800 border-green-500' : 'bg-blue-100 text-blue-800 border-blue-500'}`;
-            t.innerText = msg;
-            t.classList.remove('hidden');
-            setTimeout(() => t.classList.add('hidden'), 3000);
-        }
-    </script>
-</body>
-</html>
+     
