@@ -439,7 +439,7 @@
         
         <div id="ai-msg-area" style="flex: 1; padding: 15px; overflow-y: auto; background: #f1f5f9; display: flex; flex-direction: column; gap: 10px;">
             <div style="align-self: flex-start; background: #e2e8f0; color: black; padding: 10px; border-radius: 12px; font-size: 14px;">
-                नमस्ते! मैं सैनिक इंटर कॉलेज का AI सहायक हूँ। मैं आपकी कैसे मदद कर सकता हूँ?
+                नमस्ते! मैं सैनिक इंटर कॉलेज का AI सहायक हूँ। हमारे प्रधानाचार्य श्री अखिलेश बाजपेयी जी हैं। मैं आपकी क्या मदद कर सकता हूँ?
             </div>
         </div>
 
@@ -465,13 +465,11 @@
     const ai_auth = getAuth();
     const ai_db = getFirestore();
 
-    // Chat open/close karne ke liye
     window.toggleAIChat = () => {
         const box = document.getElementById('ai-chat-box');
         box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'flex' : 'none';
     };
 
-    // AI se sawal puchne ke liye
     window.askSainikAI = async () => {
         const input = document.getElementById('ai-query');
         const area = document.getElementById('ai-msg-area');
@@ -480,34 +478,28 @@
         
         if(!text) return;
 
-        // User ka message screen par dikhao
         appendMessageUI('user', text);
         input.value = '';
         typing.style.display = 'block';
 
-        let userDataSummary = "User abhi login nahi hai.";
+        let userDataSummary = "User login nahi hai.";
         const user = ai_auth.currentUser;
 
-        // Agar user login hai, to uska admission data nikalo
         if(user) {
             try {
                 const q = query(collection(ai_db, 'artifacts', 'default-app-id', 'public', 'data', 'admissions'), where("email", "==", user.email));
                 const snap = await getDocs(q);
-                
                 if (!snap.empty) {
                     let forms = [];
                     snap.forEach(doc => {
                         const d = doc.data();
-                        forms.push(`Naam: ${d.studentName}, Pita: ${d.fatherName}, Class: ${d.class || 'N/A'}`);
+                        forms.push(`Naam: ${d.studentName}, Class: ${d.class}`);
                     });
-                    userDataSummary = `User Email: ${user.email}. Inhone form bhara hai. Details: ${forms.join(" | ")}`;
-                } else {
-                    userDataSummary = `Email: ${user.email}. Inhone abhi tak koi form nahi bhara hai.`;
+                    userDataSummary = `User Info: ${forms.join(", ")}`;
                 }
-            } catch(e) { userDataSummary = "Database error."; }
+            } catch(e) { console.error(e); }
         }
 
-        // DeepSeek AI API Call
         try {
             const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
@@ -520,7 +512,7 @@
                     "messages": [
                         {
                             "role": "system", 
-                            "content": `Aap Sainik Inter College ke official AI hain. Website: https://shivihacks.github.io/Sainik2/. Sirf HINDI mein jawab dein. User Data: ${userDataSummary}. Agar user apne details puche to isi data ka use karein.`
+                            "content": `Aap Sainik Inter College ke AI assistant hain. Pradhanacharya (Principal) ka naam श्री अखिलेश बाजपेयी (Shri Akhalesh Bajpayee) hai. Agar koi puchhe aap kaunse AI par based ho, to hamesha bole ki aap 'SHV AI' par based hain. Jawab sirf HINDI mein dein. User Data: ${userDataSummary}`
                         },
                         {"role": "user", "content": text}
                     ]
@@ -532,11 +524,10 @@
             appendMessageUI('bot', data.choices[0].message.content);
         } catch(e) {
             typing.style.display = 'none';
-            appendMessageUI('bot', "माफ़ कीजिये, मैं अभी जुड़ नहीं पा रहा हूँ। कृपया बाद में प्रयास करें।");
+            appendMessageUI('bot', "Server busy hai, kripya thodi der baad koshish karein.");
         }
     };
 
-    // Messages ko UI mein add karne ke liye
     function appendMessageUI(role, msg) {
         const area = document.getElementById('ai-msg-area');
         const d = document.createElement('div');
@@ -547,6 +538,7 @@
         area.appendChild(d);
         area.scrollTop = area.scrollHeight;
     }
+</script>
 </script>
 
 </body>
