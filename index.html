@@ -430,6 +430,7 @@
             setTimeout(() => t.classList.add('hidden'), 3000);
         }
     </script>
+    
     <div id="ai-widget-container" style="position: fixed; bottom: 25px; right: 25px; z-index: 10005;">
     <div id="ai-chat-box" style="display: none; width: 330px; height: 450px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); flex-direction: column; overflow: hidden; border: 2px solid #1e3a8a; margin-bottom: 80px; font-family: sans-serif;">
         <div style="background: #1e3a8a; color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
@@ -465,11 +466,13 @@
     const ai_auth = getAuth();
     const ai_db = getFirestore();
 
+    // Chat kholne/band karne ka function
     window.toggleAIChat = () => {
         const box = document.getElementById('ai-chat-box');
         box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'flex' : 'none';
     };
 
+    // AI se baat karne ka function
     window.askSainikAI = async () => {
         const input = document.getElementById('ai-query');
         const area = document.getElementById('ai-msg-area');
@@ -478,6 +481,7 @@
         
         if(!text) return;
 
+        // User ka message dikhao
         appendMessageUI('user', text);
         input.value = '';
         typing.style.display = 'block';
@@ -485,60 +489,10 @@
         let userDataSummary = "User login nahi hai.";
         const user = ai_auth.currentUser;
 
+        // Agar user login hai to uska data nikaalo
         if(user) {
-            try {
-                const q = query(collection(ai_db, 'artifacts', 'default-app-id', 'public', 'data', 'admissions'), where("email", "==", user.email));
-                const snap = await getDocs(q);
-                if (!snap.empty) {
-                    let forms = [];
-                    snap.forEach(doc => {
-                        const d = doc.data();
-                        forms.push(`Naam: ${d.studentName}, Class: ${d.class}`);
-                    });
-                    userDataSummary = `User Info: ${forms.join(", ")}`;
-                }
-            } catch(e) { console.error(e); }
-        }
+            userDataSummary = `User ki Email ID: ${user.email}. `;
 
-        try {
-            const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                method: "POST",
-                headers: {
-                    "Authorization": "Bearer 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",
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    "model": "deepseek/deepseek-chat",
-                    "messages": [
-                        {
-                            "role": "system", 
-                            "content": `Aap Sainik Inter College ke AI assistant hain. Pradhanacharya (Principal) ka naam श्री अखिलेश बाजपेयी (Shri Akhalesh Bajpayee) hai. Agar koi puchhe aap kaunse AI par based ho, to hamesha bole ki aap 'SHV AI' par based hain. Jawab sirf HINDI mein dein. User Data: ${userDataSummary}`
-                        },
-                        {"role": "user", "content": text}
-                    ]
-                })
-            });
-            
-            const data = await res.json();
-            typing.style.display = 'none';
-            appendMessageUI('bot', data.choices[0].message.content);
-        } catch(e) {
-            typing.style.display = 'none';
-            appendMessageUI('bot', "Server busy hai, kripya thodi der baad koshish karein.");
-        }
-    };
-
-    function appendMessageUI(role, msg) {
-        const area = document.getElementById('ai-msg-area');
-        const d = document.createElement('div');
-        d.style = role === 'user' 
-            ? "align-self: flex-end; background: #1e3a8a; color: white; padding: 10px; border-radius: 12px; font-size: 14px; max-width: 85%;"
-            : "align-self: flex-start; background: #e2e8f0; color: black; padding: 10px; border-radius: 12px; font-size: 14px; max-width: 85%;";
-        d.innerText = msg;
-        area.appendChild(d);
-        area.scrollTop = area.scrollHeight;
-    }
-</script>
 </script>
 
 </body>
