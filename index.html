@@ -1,533 +1,141 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sainik Inter College | Student Portal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Sainik Inter College - Student Portal</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&display=swap');
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; }
+        h2 { color: #1a5f7a; }
         
-        body {
-            font-family: 'Noto Sans Devanagari', sans-serif;
-            background-color: #f0f4f8;
-        }
+        /* Auth UI */
+        #login-section { display: block; }
+        #main-content { display: none; }
+        
+        .btn { width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        .btn-google { background: #4285F4; color: white; font-weight: bold; }
+        .btn-logout { background: #dc3545; color: white; width: auto; padding: 8px 15px; float: right; }
+        .btn-search { background: #1a5f7a; color: white; }
 
-        .principal-bounce {
-            animation: bounce 2s infinite;
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        
+        /* Profile Section */
+        .profile-box { background: #eef7fa; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: left; position: relative; }
+        .profile-box p { margin: 5px 0; color: #333; }
 
-        .fade-in {
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-
-        /* Google Button Style */
-        .google-btn {
-            background-color: white;
-            color: #757575;
-            border: 1px solid #ddd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.2s;
-        }
-        .google-btn:hover {
-            background-color: #f7f7f7;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        }
+        #resultArea { margin-top: 25px; border-top: 2px solid #eee; padding-top: 20px; text-align: left; }
+        .marks-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .marks-table td { border: 1px solid #ddd; padding: 10px; }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body>
 
-    <!-- Header -->
-    <header class="bg-blue-900 text-white shadow-lg relative">
-        <div class="container mx-auto px-4 py-4">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="text-center md:text-left">
-                    <div class="flex items-center justify-center md:justify-start gap-3">
-                        <i class="fas fa-university text-3xl text-yellow-400"></i>
-                        <h1 class="text-2xl md:text-3xl font-bold tracking-wide">सैनिक इंटर कॉलेज</h1>
-                    </div>
-                    <div class="flex items-center justify-center md:justify-start gap-2 mt-2">
-                        <span class="text-xs text-blue-200 bg-blue-800 px-2 py-1 rounded">प्रधानाचार्य</span>
-                        <span class="principal-bounce text-yellow-400 font-bold text-sm">MR. AKHALESH VAJPAYEE</span>
-                    </div>
-                </div>
-
-                <!-- Logged In Profile -->
-                <div id="userHeaderProfile" class="hidden flex items-center gap-3 bg-blue-800 px-4 py-2 rounded-lg">
-                    <div class="text-right">
-                        <div id="headerUserName" class="text-sm font-bold text-white">Student</div>
-                        <div id="headerUserEmail" class="text-xs text-blue-200">user@example.com</div>
-                    </div>
-                    <button onclick="handleLogout()" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full transition-colors" title="Logout">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Navigation -->
-    <nav class="bg-white shadow-md sticky top-0 z-10">
-        <div class="container mx-auto max-w-4xl">
-            <div class="flex justify-center" id="navButtons">
-                <button onclick="switchTab('home')" id="btn-home" class="flex-1 py-3 text-blue-900 font-bold border-b-4 border-blue-900 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2">
-                    <i class="fas fa-home"></i> <span class="hidden sm:inline">होम</span>
-                </button>
-                <button onclick="switchTab('admission')" id="btn-admission" class="flex-1 py-3 text-gray-500 font-bold border-b-4 border-transparent hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
-                    <i class="fas fa-user-graduate"></i> <span class="hidden sm:inline">एडमिशन</span>
-                </button>
-                <button onclick="switchTab('auth')" id="btn-auth" class="flex-1 py-3 text-gray-500 font-bold border-b-4 border-transparent hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
-                    <i class="fas fa-sign-in-alt"></i> <span class="hidden sm:inline">लॉगिन / साइन अप</span>
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="flex-grow container mx-auto max-w-4xl px-4 py-8 relative">
-        <div id="statusMessage" class="hidden fixed top-24 right-4 z-50 max-w-sm w-full p-4 rounded-lg shadow-lg transform transition-all duration-300"></div>
-
-        <!-- 1. HOME -->
-<div class="bg-orange-50 p-4 rounded-lg border border-orange-100 mt-4">
-    <p class="text-orange-900 font-bold">📢 नई सूचना (New Update)</p>
-    <p class="text-gray-600">TIME CHANGE.</p>
-</div>
-<br>
-        <div id="home" class="tab-content active fade-in">
-            <div class="bg-white rounded-xl shadow-md overflow-hidden border-l-4 border-yellow-500 p-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <i class="fas fa-bullhorn text-yellow-600"></i> सूचना पट्ट (Notice Board)
-                </h2>
-                <div class="space-y-4">
-                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                        <p class="text-blue-900 font-bold">📢 Google लॉगिन अब उपलब्ध है</p>
-                        <p class="text-gray-600 mt-1">googfeature on</p>
-<p class="text-gray-600 mt-1">1.सभी अभिभावक ध्यान दे रोज बच्चों को स्कूल भेजें </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-<br>
-<div class="bg-white rounded-2xl shadow-xl overflow-hidden mx-2 my-10 border-b-8 border-blue-900 fade-in">
-    <div class="md:flex items-center">
-        <div class="md:w-1/3 bg-gradient-to-b from-blue-900 to-blue-800 p-8 flex justify-center">
-            <div class="relative">
-                <img src="https://image2url.com/r2/default/images/1769854506443-e2a00453-6e6f-4175-88f2-99d39ee2c355.blob" 
-                     alt="Akhalesh Bajpeyi" 
-                     class="w-44 h-44 object-cover rounded-full border-4 border-yellow-400 shadow-2xl">
-                <div class="absolute -bottom-2 -right-2 bg-yellow-400 text-blue-900 p-2 rounded-full font-bold text-xs shadow-lg">
-                    Principal
-                </div>
-            </div>
-        </div>
-        
-        <div class="md:w-2/3 p-8 text-center md:text-left">
-            <h2 class="text-2xl font-bold text-blue-900 mb-2">प्रधानाचार्य का संदेश</h2>
-            <hr class="w-20 border-2 border-yellow-500 mb-4 mx-auto md:mx-0">
-            <p class="text-gray-600 italic text-sm leading-relaxed mb-6">
-                "सैनिक इंटर कॉलेज में हमारा प्रयास है कि हम ग्रामीण क्षेत्र के बच्चों को आधुनिक तकनीक और अनुशासन के साथ उच्च श्रेणी की शिक्षा प्रदान करें। उज्जवल भविष्य के लिए आपका स्वागत है।"
-            </p>
-            <div>
-                <p class="text-lg font-bold text-gray-800">मि. अखिलेश बाजपेयी</p>
-                <p class="text-blue-600 text-xs font-bold uppercase tracking-widest">Sainik Inter College</p>
-            </div>
-        </div>
-    </div>
-</div>
-<br>
-
-        <!-- 2. ADMISSION -->
-        <div id="admission" class="tab-content fade-in">
-            <div id="admissionLocked" class="bg-white rounded-xl shadow-md p-8 text-center border-t-4 border-gray-400">
-                <div class="text-6xl text-gray-300 mb-4"><i class="fas fa-lock"></i></div>
-                <h3 class="text-2xl font-bold text-gray-700 mb-2">लॉगिन आवश्यक है</h3>
-                <p class="text-gray-500 mb-6">एडमिशन फॉर्म भरने के लिए पहले लॉगिन करें।</p>
-                <button onclick="switchTab('auth')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full">लॉगिन करें</button>
-            </div>
-
-            <div id="admissionFormContainer" class="hidden bg-white rounded-xl shadow-md p-6 border-t-4 border-green-500">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">ऑनलाइन एडमिशन फॉर्म</h2>
-                <form id="admForm" class="space-y-5">
-                    <div class="grid md:grid-cols-2 gap-5">
-                        <input type="text" id="sName" class="w-full p-3 border rounded-lg" placeholder="छात्र का नाम" required>
-                        <input type="text" id="fName" class="w-full p-3 border rounded-lg" placeholder="पिता का नाम" required>
-                    </div>
-                    <div class="grid md:grid-cols-2 gap-5">
-                        <select id="sClass" class="w-full p-3 border rounded-lg bg-white" required>
-                            <option value="">कक्षा चुनें...</option>
-                            <option>6th</option><option>9th</option><option>11th</option>
-                        </select>
-                        <input type="tel" id="sPhone" class="w-full p-3 border rounded-lg" placeholder="मोबाइल नंबर" pattern="[0-9]{10}" required>
-                    </div>
-                    <button type="submit" id="submitBtn" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg shadow hover:bg-green-700 transition">सबमिट करें</button>
-                </form>
-            </div>
-        </div>
-<br>
-<div class="relative max-w-4xl mx-auto my-10 px-2 overflow-hidden">
-    <div id="slider-container" class="relative h-64 md:h-[450px] rounded-2xl shadow-2xl border-4 border-white overflow-hidden">
-        
-        <div class="mySlides animate__animated animate__fadeIn absolute inset-0">
-            <img src="https://image2url.com/r2/default/images/1769875513895-0321fbbd-b1ed-49fb-8612-a8e4a4135c89.blob" class="w-full h-full object-cover">
-            <div class="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-sm p-4 text-white text-center font-bold">
-              🌲एक पेड़ माँ नाम
-            </div>
-        </div>
-
-        <div class="mySlides animate__animated animate__fadeIn absolute inset-0 hidden">
-            <img src="https://image2url.com/r2/default/images/1769875626838-9229a4b9-ccdd-43f7-b999-5df070bf7ba9.blob" class="w-full h-full object-cover">
-            <div class="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-sm p-4 text-white text-center font-bold">
-               🌲एक पेड़ माँ के नाम
-            </div>
-        </div>
-
-        <div class="mySlides animate__animated animate__fadeIn absolute inset-0 hidden">
-            <img src="https://image2url.com/r2/default/images/1769875727935-7857b7f3-8ad7-453f-8b6f-8436e4d2d915.blob" class="w-full h-full object-cover">
-            <div class="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-sm p-4 text-white text-center font-bold">
-                🌲एक पेड़ माँ के नाम
-            </div>
-        </div>
-
+<div class="container">
+    <div id="login-section">
+        <h2>Sainik Inter College</h2>
+        <p>Please login with Google to access your result</p>
+        <button class="btn btn-google" onclick="login()">Login with Google</button>
     </div>
 
-    <div class="flex justify-center gap-3 mt-4">
-        <span class="dot w-3 h-3 bg-blue-900 rounded-full transition-all duration-300"></span>
-        <span class="dot w-3 h-3 bg-gray-300 rounded-full transition-all duration-300"></span>
-        <span class="dot w-3 h-3 bg-gray-300 rounded-full transition-all duration-300"></span>
-    </div>
-</div>
-
-<script>
-    let slideIndex = 0;
-    showSlides();
-
-    function showSlides() {
-        let i;
-        let slides = document.getElementsByClassName("mySlides");
-        let dots = document.getElementsByClassName("dot");
+    <div id="main-content">
+        <button class="btn btn-logout" onclick="logout()">Logout</button>
+        <div style="clear: both;"></div>
         
-        // Sabhi slides ko pehle hide karein
-        for (i = 0; i < slides.length; i++) {
-            slides[i].classList.add("hidden");
-        }
-        
-        slideIndex++;
-        if (slideIndex > slides.length) {slideIndex = 1}
-        
-        // Sabhi dots ko gray karein
-        for (i = 0; i < dots.length; i++) {
-            dots[i].className = dots[i].className.replace(" bg-blue-900", " bg-gray-300");
-        }
-        
-        // Current slide dikhayein aur dot color badlein
-        slides[slideIndex-1].classList.remove("hidden");
-        dots[slideIndex-1].className = dots[slideIndex-1].className.replace(" bg-gray-300", " bg-blue-900");
-        
-        setTimeout(showSlides, 4000); // 4 Second mein photo apne aap badlegi
-    }
-</script>
-
-
-        <!-- 3. AUTH TAB -->
-        <div id="auth" class="tab-content fade-in">
-            <div class="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8">
-                
-                <h2 class="text-2xl font-bold text-center text-blue-900 mb-6" id="authTitle">लॉगिन (Login)</h2>
-
-                <!-- Google Login Button -->
-                <button id="googleLoginBtn" class="w-full google-btn py-3 rounded-lg font-medium mb-6 shadow-sm border">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5">
-                    Google के साथ आगे बढ़ें
-                </button>
-
-                <div class="relative flex py-3 items-center mb-6">
-                    <div class="flex-grow border-t border-gray-300"></div>
-                    <span class="flex-shrink mx-4 text-gray-400 text-sm">या (Email से)</span>
-                    <div class="flex-grow border-t border-gray-300"></div>
-                </div>
-
-                <!-- Login View -->
-                <div id="view-login">
-                    <form id="loginForm" class="space-y-4">
-                        <input type="email" id="loginEmail" class="w-full p-3 border rounded-lg" placeholder="ईमेल" required>
-                        <input type="password" id="loginPass" class="w-full p-3 border rounded-lg" placeholder="पासवर्ड" required>
-                        <button type="submit" class="w-full bg-blue-900 text-white py-3 rounded-lg font-bold">लॉगिन</button>
-                    </form>
-                    <div class="mt-4 flex justify-between text-sm">
-                        <a href="#" onclick="showAuthView('register')" class="text-blue-600 font-bold">नया अकाउंट बनाएं</a>
-                        <a href="#" onclick="showAuthView('forgot')" class="text-gray-500">पासवर्ड भूल गए?</a>
-                    </div>
-                </div>
-
-                <!-- Register View -->
-                <div id="view-register" class="hidden">
-                    <form id="registerForm" class="space-y-4">
-                        <input type="email" id="regEmail" class="w-full p-3 border rounded-lg" placeholder="ईमेल" required>
-                        <input type="password" id="regPass" class="w-full p-3 border rounded-lg" placeholder="पासवर्ड (Min 6 char)" required>
-                        <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold">रजिस्टर करें</button>
-                    </form>
-                    <button onclick="showAuthView('login')" class="mt-4 text-blue-600 text-sm font-bold">वापस लॉगिन पर जाएं</button>
-                </div>
-
-                <!-- Forgot View -->
-                <div id="view-forgot" class="hidden text-center">
-                    <p class="text-sm text-gray-600 mb-4">अपना ईमेल डालें, हम पासवर्ड रिसेट लिंक भेजेंगे।</p>
-                    <form id="forgotForm" class="space-y-4">
-                        <input type="email" id="forgotEmail" class="w-full p-3 border rounded-lg" placeholder="ईमेल" required>
-                        <button type="submit" class="w-full bg-orange-500 text-white py-3 rounded-lg font-bold">लिंक भेजें</button>
-                    </form>
-                    <button onclick="showAuthView('login')" class="mt-4 text-blue-600 text-sm font-bold">वापस लॉगिन</button>
-                </div>
-
-            </div>
-        </div>
-    </main>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, 
-            signOut, sendPasswordResetEmail, onAuthStateChanged,
-            GoogleAuthProvider, signInWithPopup 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyCtsXHf2h90xQvjcpjte-lzO89LSZKJMOo",
-            authDomain: "sainik-inter-collage.firebaseapp.com",
-            projectId: "sainik-inter-collage",
-            storageBucket: "sainik-inter-collage.firebasestorage.app",
-            messagingSenderId: "848432356497",
-            appId: "1:848432356497:web:7a89e08caa29fc4e61b330"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const googleProvider = new GoogleAuthProvider();
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
-        let currentUser = null;
-
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            updateUI(user);
-        });
-
-        // 1. Google Login
-        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
-            try {
-                showToast("Google से लॉगिन हो रहा है...", "info");
-                await signInWithPopup(auth, googleProvider);
-                showToast("सफल लॉगिन!", "success");
-                window.switchTab('home');
-            } catch (error) {
-                console.error(error);
-                showToast("Google लॉगिन फेल हुआ।", "error");
-            }
-        });
-
-        // 2. Email Login
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            try {
-                await signInWithEmailAndPassword(auth, loginEmail.value, loginPass.value);
-                showToast("लॉगिन सफल!", "success");
-                window.switchTab('home');
-            } catch (error) { showToast("लॉगिन त्रुटि: " + error.message, "error"); }
-        });
-
-        // 3. Register
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            try {
-                await createUserWithEmailAndPassword(auth, regEmail.value, regPass.value);
-                showToast("अकाउंट बन गया!", "success");
-                window.switchTab('home');
-            } catch (error) { showToast("रजिस्टर त्रुटि: " + error.message, "error"); }
-        });
-
-        // 4. Logout
-        window.handleLogout = () => signOut(auth);
-
-        // 5. Submit Form
-        document.getElementById('admForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if(!currentUser) return;
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            try {
-                const admissionsRef = collection(db, 'artifacts', appId, 'public', 'data', 'admissions');
-                await addDoc(admissionsRef, {
-                    studentName: sName.value,
-                    fatherName: fName.value,
-                    class: sClass.value,
-                    phone: sPhone.value,
-                    email: currentUser.email,
-                    submittedAt: serverTimestamp()
-                });
-                showToast("आवेदन जमा हो गया!", "success");
-                admForm.reset();
-            } catch (e) { showToast("Error: " + e.message, "error"); }
-            btn.disabled = false;
-        });
-
-        function updateUI(user) {
-            const btnAuth = document.getElementById('btn-auth');
-            const profile = document.getElementById('userHeaderProfile');
-            const locked = document.getElementById('admissionLocked');
-            const form = document.getElementById('admissionFormContainer');
-            if (user) {
-                btnAuth.classList.add('hidden');
-                profile.classList.replace('hidden', 'flex');
-                document.getElementById('headerUserEmail').innerText = user.email;
-                document.getElementById('headerUserName').innerText = user.displayName || user.email.split('@')[0];
-                locked.classList.add('hidden');
-                form.classList.remove('hidden');
-            } else {
-                btnAuth.classList.remove('hidden');
-                profile.classList.replace('flex', 'hidden');
-                locked.classList.remove('hidden');
-                form.classList.add('hidden');
-            }
-        }
-
-        window.showAuthView = (view) => {
-            ['view-login', 'view-register', 'view-forgot'].forEach(v => document.getElementById(v).classList.add('hidden'));
-            document.getElementById(`view-${view}`).classList.remove('hidden');
-            document.getElementById('authTitle').innerText = view === 'login' ? 'लॉगिन' : view === 'register' ? 'नया अकाउंट' : 'पासवर्ड रिसेट';
-        };
-
-        window.switchTab = (tab) => {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.getElementById(tab).classList.add('active');
-            ['btn-home', 'btn-admission', 'btn-auth'].forEach(b => {
-                const el = document.getElementById(b);
-                if(el) el.className = b === `btn-${tab}` ? "flex-1 py-3 text-blue-900 font-bold border-b-4 border-blue-900 bg-blue-50" : "flex-1 py-3 text-gray-500 font-bold border-b-4 border-transparent";
-            });
-        };
-
-        function showToast(msg, type) {
-            const t = document.getElementById('statusMessage');
-            t.className = `fixed top-24 right-4 z-50 p-4 rounded-lg shadow-lg border-l-4 ${type === 'success' ? 'bg-green-100 text-green-800 border-green-500' : 'bg-blue-100 text-blue-800 border-blue-500'}`;
-            t.innerText = msg;
-            t.classList.remove('hidden');
-            setTimeout(() => t.classList.add('hidden'), 3000);
-        }
-    
-    <div id="ai-widget-container" style="position: fixed; bottom: 25px; right: 25px; z-index: 10005;">
-    <div id="ai-chat-box" style="display: none; width: 330px; height: 450px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); flex-direction: column; overflow: hidden; border: 2px solid #1e3a8a; margin-bottom: 80px; font-family: sans-serif;">
-        <div style="background: #1e3a8a; color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
-            <span><i class="fas fa-robot"></i> सैनिक AI सहायक</span>
-            <button onclick="toggleAIChat()" style="background:none; border:none; color:white; cursor:pointer; font-size:20px;">&times;</button>
-        </div>
-        
-        <div id="ai-msg-area" style="flex: 1; padding: 15px; overflow-y: auto; background: #f1f5f9; display: flex; flex-direction: column; gap: 10px;">
-            <div style="align-self: flex-start; background: #e2e8f0; color: black; padding: 10px; border-radius: 12px; font-size: 14px;">
-                नमस्ते! मैं सैनिक इंटर कॉलेज का AI सहायक हूँ। हमारे प्रधानाचार्य श्री अखिलेश बाजपेयी जी हैं। मैं आपकी क्या मदद कर सकता हूँ?
-            </div>
+        <div class="profile-box">
+            <h3>My Profile</h3>
+            <p><strong>Email ID:</strong> <span id="userEmail"></span></p>
         </div>
 
-        <div id="typing-text" style="display:none; padding: 5px 15px; font-size: 12px; color: #666; font-style: italic;">सैनिक AI सोच रहा है...</div>
+        <h2>Check Result</h2>
+        <select id="examType">
+            <option value="Exam 1">Exam 1</option>
+            <option value="Exam 2">Exam 2</option>
+            <option value="Exam 3">Exam 3</option>
+        </select>
+        <select id="studentClass">
+            <option value="6">Class 6</option>
+            <option value="10">Class 10</option>
+            <option value="12">Class 12</option>
+        </select>
+        <input type="text" id="rollNo" placeholder="Enter Roll Number">
+        <button class="btn btn-search" onclick="fetchResult()">Show Result</button>
 
-        <div style="padding: 10px; border-top: 1px solid #ddd; display: flex; gap: 5px; background: white;">
-            <input type="text" id="ai-query" style="flex: 1; border: 1px solid #ccc; padding: 8px 12px; border-radius: 20px; outline: none; font-size: 14px;" placeholder="अपना सवाल पूछें...">
-            <button onclick="askSainikAI()" style="background: #1e3a8a; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
-                <i class="fas fa-paper-plane"></i>
-            </button>
+        <div id="resultArea" style="display:none;">
+            <h3 id="resName"></h3>
+            <p><strong>Father's Name:</strong> <span id="resFather"></span></p>
+            <table class="marks-table" id="marksTable"></table>
         </div>
-    </div>
-
-    <div onclick="toggleAIChat()" style="width: 65px; height: 65px; background: #1e3a8a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
-        <i class="fas fa-comment-dots" style="font-size: 28px;"></i>
     </div>
 </div>
 
 <script type="module">
-    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    import { getAuth } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const ai_auth = getAuth();
-    const ai_db = getFirestore();
-
-    // Chat kholne/band karne ka function
-    window.toggleAIChat = () => {
-        const box = document.getElementById('ai-chat-box');
-        box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'flex' : 'none';
+    const firebaseConfig = {
+        apiKey: "AIzaSyCtsXHf2h90xQvjcpjte-lzO89LSZKJMOo",
+        authDomain: "sainik-inter-collage.firebaseapp.com",
+        projectId: "sainik-inter-collage",
+        storageBucket: "sainik-inter-collage.firebasestorage.app",
+        messagingSenderId: "848432356497",
+        appId: "1:848432356497:web:7a89e08caa29fc4e61b330"
     };
 
-    // AI se baat karne ka function
-    window.askSainikAI = async () => {
-        const input = document.getElementById('ai-query');
-        const area = document.getElementById('ai-msg-area');
-        const typing = document.getElementById('typing-text');
-        const text = input.value.trim();
-        
-        if(!text) return;
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
 
-        // AI se baat karne ka function
-window.askSainikAI = async () => {
-    const input = document.getElementById('ai-query');
-    const area = document.getElementById('ai-msg-area');
-    const typing = document.getElementById('typing-text');
-    const text = input.value.trim();
-    
-    if(!text) return;
+    // --- Authentication Logic ---
+    window.login = () => {
+        signInWithPopup(auth, provider).catch(err => alert(err.message));
+    };
 
-    // 1. User ka message UI mein dikhao
-    const userMsg = document.createElement('div');
-    userMsg.style = "align-self: flex-end; background: #1e3a8a; color: white; padding: 10px; border-radius: 12px; font-size: 14px; max-width: 80%;";
-    userMsg.innerText = text;
-    area.appendChild(userMsg);
+    window.logout = () => {
+        signOut(auth).then(() => {
+            document.getElementById('login-section').style.display = 'block';
+            document.getElementById('main-content').style.display = 'none';
+        });
+    };
 
-    input.value = '';
-    typing.style.display = 'block';
-    area.scrollTop = area.scrollHeight;
-
-    // 2. User data check karein
-    let userDataSummary = "User is not logged in.";
-    const user = ai_auth.currentUser;
-
-    if(user) {
-        userDataSummary = `User Email: ${user.email}. User Name: ${user.displayName || 'Student'}.`;
-    }
-
-    // 3. AI Response Logic (Simple local logic for now)
-    setTimeout(() => {
-        typing.style.display = 'none';
-        const aiMsg = document.createElement('div');
-        aiMsg.style = "align-self: flex-start; background: #e2e8f0; color: black; padding: 10px; border-radius: 12px; font-size: 14px; max-width: 80%;";
-        
-        // Simple AI Reply
-        if(text.toLowerCase().includes("principal")) {
-            aiMsg.innerText = "Our Principal is Mr. Akhalesh Vajpayee.";
-        } else if(text.toLowerCase().includes("result")) {
-            aiMsg.innerText = "You can check your result by clicking the RESULT tab in the navigation bar.";
-        } else {
-            aiMsg.innerText = "Thank you for your message! How else can I assist you today?";
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            document.getElementById('userEmail').innerText = user.email;
         }
+    });
 
-        area.appendChild(aiMsg);
-        area.scrollTop = area.scrollHeight;
-    }, 1000);
-};
+    // --- Result Logic ---
+    window.fetchResult = async function() {
+        const exam = document.getElementById('examType').value;
+        const cls = document.getElementById('studentClass').value;
+        const roll = document.getElementById('rollNo').value;
 
+        if(!roll) return alert("Roll number daalein");
+
+        const docRef = doc(db, "results", `${cls}_${exam}_${roll}`);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            document.getElementById('resultArea').style.display = 'block';
+            document.getElementById('resName').innerText = "Student: " + data.studentName;
+            document.getElementById('resFather').innerText = data.fatherName;
+            
+            document.getElementById('marksTable').innerHTML = `
+                <tr><td>Hindi</td><td>${data.hindi}</td></tr>
+                <tr><td>Math</td><td>${data.math}</td></tr>
+                <tr><td>English</td><td>${data.english}</td></tr>
+                <tr><td>Physics</td><td>${data.physics}</td></tr>
+                <tr><td>Chemistry</td><td>${data.chemistry}</td></tr>
+            `;
+        } else {
+            alert("Record nahi mila!");
+        }
+    };
 </script>
-
 </body>
 </html>
