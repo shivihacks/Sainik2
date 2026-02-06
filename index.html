@@ -480,17 +480,52 @@
         
         if(!text) return;
 
-        // User ka message dikhao
-        appendMessageUI('user', text);
-        input.value = '';
-        typing.style.display = 'block';
+        // AI se baat karne ka function
+window.askSainikAI = async () => {
+    const input = document.getElementById('ai-query');
+    const area = document.getElementById('ai-msg-area');
+    const typing = document.getElementById('typing-text');
+    const text = input.value.trim();
+    
+    if(!text) return;
 
-        let userDataSummary = "User login nahi hai.";
-        const user = ai_auth.currentUser;
+    // 1. User ka message UI mein dikhao
+    const userMsg = document.createElement('div');
+    userMsg.style = "align-self: flex-end; background: #1e3a8a; color: white; padding: 10px; border-radius: 12px; font-size: 14px; max-width: 80%;";
+    userMsg.innerText = text;
+    area.appendChild(userMsg);
 
-        // Agar user login hai to uska data nikaalo
-        if(user) {
-            userDataSummary = `User ki Email ID: ${user.email}. `;
+    input.value = '';
+    typing.style.display = 'block';
+    area.scrollTop = area.scrollHeight;
+
+    // 2. User data check karein
+    let userDataSummary = "User is not logged in.";
+    const user = ai_auth.currentUser;
+
+    if(user) {
+        userDataSummary = `User Email: ${user.email}. User Name: ${user.displayName || 'Student'}.`;
+    }
+
+    // 3. AI Response Logic (Simple local logic for now)
+    setTimeout(() => {
+        typing.style.display = 'none';
+        const aiMsg = document.createElement('div');
+        aiMsg.style = "align-self: flex-start; background: #e2e8f0; color: black; padding: 10px; border-radius: 12px; font-size: 14px; max-width: 80%;";
+        
+        // Simple AI Reply
+        if(text.toLowerCase().includes("principal")) {
+            aiMsg.innerText = "Our Principal is Mr. Akhalesh Vajpayee.";
+        } else if(text.toLowerCase().includes("result")) {
+            aiMsg.innerText = "You can check your result by clicking the RESULT tab in the navigation bar.";
+        } else {
+            aiMsg.innerText = "Thank you for your message! How else can I assist you today?";
+        }
+
+        area.appendChild(aiMsg);
+        area.scrollTop = area.scrollHeight;
+    }, 1000);
+};
 
 </script>
 
