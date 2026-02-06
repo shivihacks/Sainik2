@@ -430,5 +430,124 @@
             setTimeout(() => t.classList.add('hidden'), 3000);
         }
     </script>
+    <div id="ai-widget-container" style="position: fixed; bottom: 25px; right: 25px; z-index: 10005;">
+    <div id="ai-chat-box" style="display: none; width: 330px; height: 450px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); flex-direction: column; overflow: hidden; border: 2px solid #1e3a8a; margin-bottom: 80px; font-family: sans-serif;">
+        <div style="background: #1e3a8a; color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
+            <span><i class="fas fa-robot"></i> सैनिक AI सहायक</span>
+            <button onclick="toggleAIChat()" style="background:none; border:none; color:white; cursor:pointer; font-size:20px;">&times;</button>
+        </div>
+        
+        <div id="ai-msg-area" style="flex: 1; padding: 15px; overflow-y: auto; background: #f1f5f9; display: flex; flex-direction: column; gap: 10px;">
+            <div style="align-self: flex-start; background: #e2e8f0; color: black; padding: 10px; border-radius: 12px; font-size: 14px;">
+                नमस्ते! मैं सैनिक इंटर कॉलेज का AI सहायक हूँ। मैं आपकी कैसे मदद कर सकता हूँ?
+            </div>
+        </div>
+
+        <div id="typing-text" style="display:none; padding: 5px 15px; font-size: 12px; color: #666; font-style: italic;">सैनिक AI सोच रहा है...</div>
+
+        <div style="padding: 10px; border-top: 1px solid #ddd; display: flex; gap: 5px; background: white;">
+            <input type="text" id="ai-query" style="flex: 1; border: 1px solid #ccc; padding: 8px 12px; border-radius: 20px; outline: none; font-size: 14px;" placeholder="अपना सवाल पूछें...">
+            <button onclick="askSainikAI()" style="background: #1e3a8a; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <div onclick="toggleAIChat()" style="width: 65px; height: 65px; background: #1e3a8a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+        <i class="fas fa-comment-dots" style="font-size: 28px;"></i>
+    </div>
+</div>
+
+<script type="module">
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+    const ai_auth = getAuth();
+    const ai_db = getFirestore();
+
+    // Chat open/close karne ke liye
+    window.toggleAIChat = () => {
+        const box = document.getElementById('ai-chat-box');
+        box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'flex' : 'none';
+    };
+
+    // AI se sawal puchne ke liye
+    window.askSainikAI = async () => {
+        const input = document.getElementById('ai-query');
+        const area = document.getElementById('ai-msg-area');
+        const typing = document.getElementById('typing-text');
+        const text = input.value.trim();
+        
+        if(!text) return;
+
+        // User ka message screen par dikhao
+        appendMessageUI('user', text);
+        input.value = '';
+        typing.style.display = 'block';
+
+        let userDataSummary = "User abhi login nahi hai.";
+        const user = ai_auth.currentUser;
+
+        // Agar user login hai, to uska admission data nikalo
+        if(user) {
+            try {
+                const q = query(collection(ai_db, 'artifacts', 'default-app-id', 'public', 'data', 'admissions'), where("email", "==", user.email));
+                const snap = await getDocs(q);
+                
+                if (!snap.empty) {
+                    let forms = [];
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        forms.push(`Naam: ${d.studentName}, Pita: ${d.fatherName}, Class: ${d.class || 'N/A'}`);
+                    });
+                    userDataSummary = `User Email: ${user.email}. Inhone form bhara hai. Details: ${forms.join(" | ")}`;
+                } else {
+                    userDataSummary = `Email: ${user.email}. Inhone abhi tak koi form nahi bhara hai.`;
+                }
+            } catch(e) { userDataSummary = "Database error."; }
+        }
+
+        // DeepSeek AI API Call
+        try {
+            const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer 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",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    "model": "deepseek/deepseek-chat",
+                    "messages": [
+                        {
+                            "role": "system", 
+                            "content": `Aap Sainik Inter College ke official AI hain. Website: https://shivihacks.github.io/Sainik2/. Sirf HINDI mein jawab dein. User Data: ${userDataSummary}. Agar user apne details puche to isi data ka use karein.`
+                        },
+                        {"role": "user", "content": text}
+                    ]
+                })
+            });
+            
+            const data = await res.json();
+            typing.style.display = 'none';
+            appendMessageUI('bot', data.choices[0].message.content);
+        } catch(e) {
+            typing.style.display = 'none';
+            appendMessageUI('bot', "माफ़ कीजिये, मैं अभी जुड़ नहीं पा रहा हूँ। कृपया बाद में प्रयास करें।");
+        }
+    };
+
+    // Messages ko UI mein add karne ke liye
+    function appendMessageUI(role, msg) {
+        const area = document.getElementById('ai-msg-area');
+        const d = document.createElement('div');
+        d.style = role === 'user' 
+            ? "align-self: flex-end; background: #1e3a8a; color: white; padding: 10px; border-radius: 12px; font-size: 14px; max-width: 85%;"
+            : "align-self: flex-start; background: #e2e8f0; color: black; padding: 10px; border-radius: 12px; font-size: 14px; max-width: 85%;";
+        d.innerText = msg;
+        area.appendChild(d);
+        area.scrollTop = area.scrollHeight;
+    }
+</script>
+
 </body>
 </html>
